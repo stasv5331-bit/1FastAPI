@@ -1,14 +1,18 @@
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 import os
 
-# Создаем приложение
-app = FastAPI()
+# Импортируем модели
+from models import User, Feedback
 
-# Указываем папку с шаблонами
+# Импортируем функции для работы с отзывами ИЗ ПАПКИ DATA
+from data.feedback_storage import add_feedback, get_all_feedbacks, get_feedbacks_count
+
+app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-# ----- СТАРЫЙ КОД (GET запрос) -----
+# ----- СТАРЫЙ КОД (GET /) -----
 @app.get("/")
 async def read_root(request: Request):
     message = "Привет, это строка из FastAPI!"
@@ -18,21 +22,44 @@ async def read_root(request: Request):
         context={"data": message}
     )
 
-# ----- НОВЫЙ КОД (POST запрос) -----
-from pydantic import BaseModel  # Добавь этот импорт в начало файла!
-
-# Создаем модель данных для двух чисел
+# ----- СТАРЫЙ КОД (POST /calculate) -----
 class Numbers(BaseModel):
     num1: float
     num2: float
 
-# Создаем маршрут для POST запроса
 @app.post("/calculate")
 async def calculate(numbers: Numbers):
     result = numbers.num1 + numbers.num2
     return {"result": result}
 
-# ----- КОД ДЛЯ ЗАПУСКА (остается без изменений) -----
+# ----- СТАРЫЙ КОД (GET /users) -----
+user = User(name="John Doe", id=1)
+
+@app.get("/users")
+async def get_user():
+    return user
+
+# ----- НОВЫЙ КОД (POST /feedback) -----
+@app.post("/feedback")
+async def create_feedback(feedback: Feedback):
+    # Сохраняем отзыв через функцию из папки data
+    add_feedback(feedback)
+    
+    # Отправляем ответ пользователю
+    return {
+        "message": f"Feedback received. Thank you, {feedback.name}."
+    }
+
+# ----- НОВЫЙ КОД (GET /feedbacks) для просмотра всех отзывов -----
+@app.get("/feedbacks")
+async def get_all_feedbacks_route():
+    all_feedbacks = get_all_feedbacks()
+    return {
+        "feedbacks": all_feedbacks,
+        "total": get_feedbacks_count()
+    }
+
+# ----- КОД ДЛЯ ЗАПУСКА -----
 if __name__ == "__main__":
     import uvicorn
     file_name = os.path.basename(__file__)
