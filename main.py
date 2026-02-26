@@ -3,8 +3,16 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import os
 
+<<<<<<< HEAD
 # Импортируем модели
 from models import User, Feedback
+=======
+# ----- НОВЫЙ ИМПОРТ -----
+from models import User  # Импортируем модель User из файла models.py
+
+# Создаем приложение
+app = FastAPI()
+>>>>>>> cabe61b76a35df286ca1cb96aa4bdc88f3a398dd
 
 # Импортируем функции для работы с отзывами ИЗ ПАПКИ DATA
 from data.feedback_storage import add_feedback, get_all_feedbacks, get_feedbacks_count
@@ -22,7 +30,11 @@ async def read_root(request: Request):
         context={"data": message}
     )
 
+<<<<<<< HEAD
 # ----- СТАРЫЙ КОД (POST /calculate) -----
+=======
+# ----- СТАРЫЙ КОД (POST запрос) -----
+>>>>>>> cabe61b76a35df286ca1cb96aa4bdc88f3a398dd
 class Numbers(BaseModel):
     num1: float
     num2: float
@@ -32,11 +44,17 @@ async def calculate(numbers: Numbers):
     result = numbers.num1 + numbers.num2
     return {"result": result}
 
+<<<<<<< HEAD
 # ----- СТАРЫЙ КОД (GET /users) -----
+=======
+# ----- НОВЫЙ КОД (GET /users) -----
+# Создаем экземпляр (объект) пользователя
+>>>>>>> cabe61b76a35df286ca1cb96aa4bdc88f3a398dd
 user = User(name="John Doe", id=1)
 
 @app.get("/users")
 async def get_user():
+<<<<<<< HEAD
     return user
 
 # ----- НОВЫЙ КОД (POST /feedback) -----
@@ -60,6 +78,12 @@ async def get_all_feedbacks_route():
     }
 
 # ----- КОД ДЛЯ ЗАПУСКА -----
+=======
+    # FastAPI автоматически преобразует объект User в JSON
+    return user
+
+# ----- КОД ДЛЯ ЗАПУСКА (остается без изменений) -----
+>>>>>>> cabe61b76a35df286ca1cb96aa4bdc88f3a398dd
 if __name__ == "__main__":
     import uvicorn
     file_name = os.path.basename(__file__)
